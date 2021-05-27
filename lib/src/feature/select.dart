@@ -7,7 +7,12 @@ class SelectCommand extends Command<String> {
   final InternetMovieDatabase db;
 
   SelectCommand(this.db) {
-    argParser.addOption('query', abbr: 'q');
+    argParser.addOption(
+      'query',
+      abbr: 'q',
+      valueHelp: 'NAME',
+      help: 'Найти фильм',
+    );
   }
 
   @override
@@ -69,6 +74,9 @@ class SelectCommand extends Command<String> {
         Variable.withString('$param%'),
       ],
     ).get();
+    if (rows.isEmpty) {
+      return 'Nothing found...';
+    }
     final builder = StringBuffer(_header);
     for (final row in rows) {
       builder.writeln(_buildRowRepresentation(row));

@@ -9,13 +9,16 @@ void main(List<String> args) => runZonedGuarded(
         if (args.isEmpty) io.exit(0);
         final stopwatch = Stopwatch()..start();
         final db = InternetMovieDatabase();
-        final runner = CommandRunner<String>('IMDB', 'IMDB Sample DB')
+        final runner = CommandRunner<String>('IMDB', 'IMDB Sample DB', usageLineLength: 64)
           ..addCommand(VacuumCommand(db))
           ..addCommand(PrepareCommand(db))
           ..addCommand(CountCommand(db))
           ..addCommand(SelectCommand(db));
         try {
           final result = await runner.run(args);
+          if (result == null) {
+            io.exit(0);
+          }
           io.stdout.writeln(result);
         } finally {
           final elapsedMilliseconds = (stopwatch..stop()).elapsedMilliseconds;
