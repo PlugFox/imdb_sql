@@ -58,7 +58,7 @@ class SelectCommand extends Command<String> {
     |      word LIKE ?
     |    ORDER BY
     |      title_id ASC
-    |    LIMIT 100 OFFSET 0
+    |    LIMIT 25 OFFSET 0
     |  ) AS w
     |  INNER JOIN titles AS t
     |    ON w.title_id = t.title_id
