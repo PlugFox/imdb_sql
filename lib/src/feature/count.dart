@@ -17,11 +17,6 @@ class CountCommand extends Command<String> {
         .customSelect('SELECT COUNT(1) AS count FROM titles')
         .getSingle()
         .then<String>((value) => value.data['count'].toString());
-    final wordCount = await db
-        .customSelect('SELECT COUNT(1) AS count FROM words')
-        .getSingle()
-        .then<String>((value) => value.data['count'].toString());
-    return 'Количество фильмов: $titleCount шт.\n'
-        'Количество слов: $wordCount шт.';
+    return 'Количество фильмов: $titleCount шт.';
   }
 }

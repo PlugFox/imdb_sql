@@ -12,7 +12,8 @@ void main(List<String> args) => runZonedGuarded(
         final runner = CommandRunner<String>('IMDB', 'IMDB Sample DB')
           ..addCommand(VacuumCommand(db))
           ..addCommand(PrepareCommand(db))
-          ..addCommand(CountCommand(db));
+          ..addCommand(CountCommand(db))
+          ..addCommand(SelectCommand(db));
         try {
           final result = await runner.run(args);
           io.stdout.writeln(result);
