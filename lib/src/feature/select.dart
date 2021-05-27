@@ -10,8 +10,8 @@ class SelectCommand extends Command<String> {
     argParser.addOption(
       'query',
       abbr: 'q',
-      valueHelp: 'NAME',
-      help: 'Найти фильм',
+      valueHelp: 'title',
+      help: 'Найти фильм по части первого слова заголовка',
     );
   }
 
@@ -27,7 +27,8 @@ class SelectCommand extends Command<String> {
     if (arg is! String || arg.trim().length < 3) {
       return 'Отсутсвует строка запроса или содержит меньше 3 символов';
     }
-    final param = arg.trim().toLowerCase();
+    final title = arg.trim().toLowerCase();
+    final firstWord = title.split(' ').first;
     final rows = await db.customSelect(
       '''
     |SELECT
@@ -52,7 +53,7 @@ class SelectCommand extends Command<String> {
     |        FROM
     |          words
     |        WHERE
-    |          ${param.length > 4 ? 'first_5_char = substr(?, 1, 5)' : 'first_3_char = substr(?, 1, 3)'}
+    |          ${firstWord.length > 4 ? 'first_5_char = substr(?, 1, 5)' : 'first_3_char = substr(?, 1, 3)'}
     |      )
     |    WHERE
     |      word LIKE ?
@@ -70,8 +71,8 @@ class SelectCommand extends Command<String> {
     '''
           .multiline(),
       variables: <Variable>[
-        Variable.withString(param),
-        Variable.withString('$param%'),
+        Variable.withString(firstWord),
+        Variable.withString('$firstWord%'),
       ],
     ).get();
     if (rows.isEmpty) {
@@ -92,8 +93,8 @@ class SelectCommand extends Command<String> {
     final d = row.data;
     String fmtLeft(String field, int length) => (d[field] ?? '').toString().padLeft(length, ' ').substring(0, length);
     String fmtRight(String field, int length) => (d[field] ?? '').toString().padRight(length, ' ').substring(0, length);
-    return '${fmtLeft('id', 9)} | ${d['is_adult'] == 1 ? 'yes' : ' no'} | ${fmtLeft('runtime_minutes', 4)} | ${fmtRight('title', 64)}\n'
-        '${fmtLeft('votes', 9)} | ${fmtLeft('rating', 3)} | ${fmtLeft('premiered', 4)} | ${fmtRight('url', 64)}\n'
+    return '${fmtLeft('id', 9)} | ${d['is_adult'] == 1 ? 'yes' : ' no'} | ${fmtLeft('runtime_minutes', 4)} | ${fmtRight('title', 36)}\n'
+        '${fmtLeft('votes', 9)} | ${fmtLeft('rating', 3)} | ${fmtLeft('premiered', 4)} | ${fmtRight('url', 36)}\n'
         '${'-' * 61}';
   }
 }
