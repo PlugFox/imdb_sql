@@ -47,7 +47,7 @@ class SelectCommand extends Command<String> {
     |        FROM
     |          words
     |        WHERE
-    |          first_3_char = substr(?, 1, 3)
+    |          ${param.length > 4 ? 'first_5_char = substr(?, 1, 5)' : 'first_3_char = substr(?, 1, 3)'}
     |      )
     |    WHERE
     |      word LIKE ?
@@ -65,7 +65,7 @@ class SelectCommand extends Command<String> {
     '''
           .multiline(),
       variables: <Variable>[
-        Variable.withString(param.substring(0, 3)),
+        Variable.withString(param),
         Variable.withString('$param%'),
       ],
     ).get();
@@ -76,16 +76,16 @@ class SelectCommand extends Command<String> {
     return builder.toString();
   }
 
-  static String get _header => '${'ID'.padLeft(9)}|18+|TIME|TITLE\n'
-      '${'VOTES'.padLeft(9)}|RTG|YEAR|URL\n'
-      '${'-' * 55}\n';
+  static String get _header => '${'ID'.padLeft(9)} | 18+ | TIME | TITLE\n'
+      '${'VOTES'.padLeft(9)} | RTG | YEAR | URL\n'
+      '${'-' * 61}\n';
 
   String _buildRowRepresentation(QueryRow row) {
     final d = row.data;
     String fmtLeft(String field, int length) => (d[field] ?? '').toString().padLeft(length, ' ').substring(0, length);
     String fmtRight(String field, int length) => (d[field] ?? '').toString().padRight(length, ' ').substring(0, length);
-    return '${fmtLeft('id', 9)}|${d['is_adult'] == 1 ? 'yes' : ' no'}|${fmtLeft('runtime_minutes', 4)}|${fmtRight('title', 64)}\n'
-        '${fmtLeft('votes', 9)}|${fmtLeft('rating', 3)}|${fmtLeft('premiered', 4)}|${fmtRight('url', 64)}\n'
-        '${'-' * 55}';
+    return '${fmtLeft('id', 9)} | ${d['is_adult'] == 1 ? 'yes' : ' no'} | ${fmtLeft('runtime_minutes', 4)} | ${fmtRight('title', 64)}\n'
+        '${fmtLeft('votes', 9)} | ${fmtLeft('rating', 3)} | ${fmtLeft('premiered', 4)} | ${fmtRight('url', 64)}\n'
+        '${'-' * 61}';
   }
 }
